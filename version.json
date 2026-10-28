@@ -1,7 +1,8 @@
+
 {
-  "version": "7.0.0",
-  "version_code": 7,
-  "download_url": "",
-  "sha256": "",
-  "release_notes": "Wersja początkowa ADS PRO na Raspberry Pi 4."
+  "version": "8.0.0",
+  "version_code": 8,
+  "download_url": "https://github.com/pixii69-ui/ads-pro-updates/releases/download/v8.0.0/ADS_PRO_V8_FINAL.zip",
+  "sha256": "6079c42c449d2f72dc6addaafa78b21c8665721dc2b9eac1d410470b770c7d18",
+  "release_notes": "ADS PRO V8 - test aktualizacji online z GitHub."
 }
