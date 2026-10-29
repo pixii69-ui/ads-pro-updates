@@ -12,9 +12,9 @@ from pathlib import Path
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('commit');args=parser.parse_args()
     if not re.fullmatch('[0-9a-f]{40}',args.commit):raise ValueError('Full commit SHA required')
-    key=os.environ.pop('ADS_PRO_SOURCE_DEPLOY_KEY')
+    key=os.environ.pop('ADS_PRO_SOURCE_DEPLOY_KEY').replace('\r\n','\n').strip()+'\n'
     with tempfile.TemporaryDirectory(prefix='ads-source-key-') as tmp:
-        folder=Path(tmp);private=folder/'key';private.write_text(key+'\n');private.chmod(0o600)
+        folder=Path(tmp);private=folder/'key';private.write_text(key,encoding='ascii');private.chmod(0o600)
         with urllib.request.urlopen('https://api.github.com/meta',timeout=20) as response:meta=json.load(response)
         hosts=folder/'known_hosts';hosts.write_text(''.join('github.com '+item+'\n' for item in meta['ssh_keys']))
         env=dict(os.environ,GIT_SSH_COMMAND=f'ssh -i {private} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile={hosts}')
