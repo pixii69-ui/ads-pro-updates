@@ -1,0 +1,67 @@
+name: Publish ADS PRO after owner approval
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: 'Full 40-character commit from private ads-pro-source'
+        required: true
+        type: string
+      version:
+        description: 'Approved N.0.0 version'
+        required: true
+        type: string
+      confirmation:
+        description: 'Type PUBLIKUJ followed by the approved version, e.g. PUBLIKUJ 10.0.0'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ads-pro-ota-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.actor == 'pixii69-ui' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: ads-pro-ota-publication
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - name: Validate explicit approval inputs
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          VERSION: ${{ inputs.version }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          python - <<'PY'
+          import os,re
+          assert re.fullmatch('[0-9a-f]{40}',os.environ['SOURCE_COMMIT'])
+          assert re.fullmatch(r'[1-9][0-9]*\.0\.0',os.environ['VERSION'])
+          assert os.environ['CONFIRMATION']=='PUBLIKUJ '+os.environ['VERSION']
+          PY
+      - name: Read exactly the approved private commit
+        env:
+          ADS_PRO_SOURCE_DEPLOY_KEY: ${{ secrets.ADS_PRO_SOURCE_DEPLOY_KEY }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: python tools/clone_source.py "$SOURCE_COMMIT"
+      - name: Check sources, test and build candidate without publishing
+        working-directory: source
+        env:
+          APPROVED_VERSION: ${{ inputs.version }}
+        run: |
+          python -B tools/check.py
+          python -B -m unittest discover -s tests -v
+          python -B tools/build.py --expected-version "$APPROVED_VERSION"
+      - name: Publish ZIP and then advance manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          APPROVED_VERSION: ${{ inputs.version }}
+          APPROVAL: ${{ inputs.confirmation }}
+        run: python tools/publish.py --folder source/outputs/candidate --commit "$SOURCE_COMMIT" --version "$APPROVED_VERSION" --confirmation "$APPROVAL" --execute
