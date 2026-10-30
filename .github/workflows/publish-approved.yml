@@ -55,11 +55,13 @@ jobs:
         env:
           APPROVED_VERSION: ${{ inputs.version }}
         run: |
+          python -m pip install -r requirements-dev.txt
           python -B tools/check.py
           python -B -m unittest discover -s tests -v
           python -B tools/build.py --expected-version "$APPROVED_VERSION"
       - name: Publish ZIP and then advance manifest
         env:
+          ADS_PRO_SIGNING_KEY: ${{ secrets.ADS_PRO_SIGNING_KEY }}
           GH_TOKEN: ${{ github.token }}
           SOURCE_COMMIT: ${{ inputs.source_commit }}
           APPROVED_VERSION: ${{ inputs.version }}
