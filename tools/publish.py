@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import urllib.request
 from pathlib import Path
+from signing import sign_program_manifest
 
 REPO='pixii69-ui/ads-pro-updates'
 
@@ -44,6 +45,8 @@ def main():
     contents=json.loads(gh('api',f'repos/{REPO}/contents/version.json'))
     current=json.loads(base64.b64decode(contents['content']))
     package,manifest=plan(args.folder,args.commit,args.version,args.confirmation,current)
+    # Fail before creating a release if identity is missing or differs from the ZIP.
+    manifest=sign_program_manifest(package,manifest,os.environ.pop('ADS_PRO_SIGNING_KEY',''))
     tag='v'+args.version
     # Never overwrite a tag, release, ZIP or manifest of an existing version.
     existing=subprocess.run(['gh','api',f'repos/{REPO}/releases/tags/{tag}'],capture_output=True,text=True)
