@@ -1,8 +1,11 @@
-
 {
-  "version": "8.0.0",
-  "version_code": 8,
-  "download_url": "https://github.com/pixii69-ui/ads-pro-updates/releases/download/v8.0.0/ADS_PRO_V8_FINAL.zip",
-  "sha256": "6079c42c449d2f72dc6addaafa78b21c8665721dc2b9eac1d410470b770c7d18",
-  "release_notes": "ADS PRO V8 - test aktualizacji online z GitHub."
+  "version": "10.0.0",
+  "version_code": 10,
+  "download_url": "https://github.com/pixii69-ui/ads-pro-updates/releases/download/v10.0.0/ADS_PRO_V10_0_0.zip",
+  "sha256": "dc82c25b3ac682cd54f30bca291e654f476256b3fc6d1c18d6a3f2e0f578db24",
+  "release_notes": "ADS PRO 10.0.0",
+  "schema": 1,
+  "channel": "program",
+  "key_id": "ads-pro-aac88a6079f30f5b",
+  "signature": "g1AOhk/fQ5WN3tGLnwEpyU46bgTmFvuG+TEqTQMm++GU0yANon1EaURkoA1SlZqR8nvybZY1xrg38WfdjrCcBQ=="
 }
